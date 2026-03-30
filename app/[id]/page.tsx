@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getEintrag, TYP_META } from '@/lib/eintraege'
+import { KAPITEL } from '@/lib/kapitel'
 import { updateEintragAction, deleteEintragAction } from '@/actions/eintraege'
 
 function Section({ label, value, bg }: { label: string; value: string | null; bg: string }) {
@@ -131,9 +132,14 @@ export default async function DetailPage({ params }: { params: Promise<{ id: str
             <form action={updateAction} className="space-y-4 mt-2">
               <input type="hidden" name="typ" value={eintrag.typ} />
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">Abschnitt</label>
-                <input name="abschnitt" type="text" required defaultValue={eintrag.abschnitt}
-                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50" />
+                <label className="block text-sm font-semibold text-slate-700 mb-1">Kapitel / Abschnitt</label>
+                <select name="abschnitt" required defaultValue={eintrag.abschnitt}
+                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50">
+                  <option value="">— Kapitel auswählen —</option>
+                  {KAPITEL.map((k) => (
+                    <option key={k} value={k}>{k}</option>
+                  ))}
+                </select>
               </div>
               {eintrag.typ === 'ki' && <>
                 <div><label className="block text-sm font-semibold text-slate-700 mb-1">Eigener Text</label>

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { createEintragAction } from '@/actions/eintraege'
+import { KAPITEL } from '@/lib/kapitel'
 
 const TYPEN = [
   { id: 'ki',        label: 'KI-Prompt',  emoji: '🤖', desc: 'ChatGPT, Claude, etc.' },
@@ -81,7 +82,17 @@ export default function NeuPage() {
           <input type="hidden" name="typ" value={typ} />
 
           {/* Gemeinsames Feld */}
-          <Field label="Abschnitt / Titel der Arbeit" name="abschnitt" required placeholder="z.B. Kapitel 2 – Methoden" />
+          <div>
+            <label htmlFor="abschnitt" className="block text-sm font-semibold text-slate-700 mb-1">
+              Kapitel / Abschnitt <span className="text-indigo-500">*</span>
+            </label>
+            <select id="abschnitt" name="abschnitt" required className={INPUT}>
+              <option value="">— Kapitel auswählen —</option>
+              {KAPITEL.map((k) => (
+                <option key={k} value={k}>{k}</option>
+              ))}
+            </select>
+          </div>
 
           {/* KI */}
           {typ === 'ki' && <>
