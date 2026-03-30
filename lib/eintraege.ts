@@ -1,28 +1,50 @@
 // lib/eintraege.ts
 import { createSupabaseClient } from '@/lib/supabase'
 
+export type Typ = 'ki' | 'literatur' | 'website' | 'bild' | 'sonstige'
+
+export const TYP_META: Record<Typ, { label: string; emoji: string }> = {
+  ki:        { label: 'KI-Prompt', emoji: '🤖' },
+  literatur: { label: 'Literatur', emoji: '📚' },
+  website:   { label: 'Website',   emoji: '🌐' },
+  bild:      { label: 'Bild',      emoji: '🖼️' },
+  sonstige:  { label: 'Sonstige',  emoji: '📄' },
+}
+
 export type Eintrag = {
   id: string
+  typ: Typ
   abschnitt: string
-  eigener_text: string | null
-  prompt: string
-  ki_ausgabe: string
   erstellt_am: string
+  // KI
+  eigener_text: string | null
+  prompt: string | null
+  ki_ausgabe: string | null
+  // Literatur
+  autor: string | null
+  titel: string | null
+  jahr: string | null
+  verlag: string | null
+  seiten: string | null
+  // Website / Bild
+  url: string | null
+  zugriffsdatum: string | null
+  // Sonstige / Bild
+  beschreibung: string | null
 }
 
-export type EintragInput = {
-  abschnitt: string
-  eigener_text?: string
-  prompt: string
-  ki_ausgabe: string
-}
+export type EintragInput = Omit<Eintrag, 'id' | 'erstellt_am'>
 
-export async function listEintraege(): Promise<Eintrag[]> {
+export async function listEintraege(typ?: string): Promise<Eintrag[]> {
   const supabase = createSupabaseClient()
-  const { data, error } = await supabase
+  let query = supabase
     .from('eintraege')
     .select('*')
     .order('erstellt_am', { ascending: false })
+  if (typ && typ !== 'alle') {
+    query = query.eq('typ', typ)
+  }
+  const { data, error } = await query
   if (error) throw new Error(error.message)
   return data as Eintrag[]
 }
@@ -38,7 +60,7 @@ export async function getEintrag(id: string): Promise<Eintrag> {
   return data as Eintrag
 }
 
-export async function createEintrag(input: EintragInput): Promise<Eintrag> {
+export async function createEintrag(input: Partial<EintragInput>): Promise<Eintrag> {
   const supabase = createSupabaseClient()
   const { data, error } = await supabase
     .from('eintraege')
