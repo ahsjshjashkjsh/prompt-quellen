@@ -35,18 +35,24 @@ export type Eintrag = {
 
 export type EintragInput = Omit<Eintrag, 'id' | 'erstellt_am'>
 
-export async function listEintraege(typ?: string): Promise<Eintrag[]> {
+// Schlanker Typ für die Listenansicht — keine grossen Textfelder
+export type EintragKurz = {
+  id: string; typ: Typ; abschnitt: string; erstellt_am: string
+  titel: string | null; url: string | null; prompt: string | null; beschreibung: string | null
+}
+
+export async function listEintraege(typ?: string): Promise<EintragKurz[]> {
   const supabase = createSupabaseClient()
   let query = supabase
     .from('eintraege')
-    .select('*')
+    .select('id,typ,abschnitt,erstellt_am,titel,url,prompt,beschreibung')
     .order('erstellt_am', { ascending: false })
   if (typ && typ !== 'alle') {
     query = query.eq('typ', typ)
   }
   const { data, error } = await query
   if (error) throw new Error(error.message)
-  return data as Eintrag[]
+  return data as EintragKurz[]
 }
 
 export async function getEintrag(id: string): Promise<Eintrag> {
